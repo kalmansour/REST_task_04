@@ -1,6 +1,7 @@
 from rest_framework import serializers
-
 from .models import Flight, Booking
+from django.contrib.auth.models import User
+
 
 
 class FlightSerializer(serializers.ModelSerializer):
@@ -25,4 +26,20 @@ class UpdateBookingSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Booking
 		fields = ['date', 'passengers']
+
+class UserCreateSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+    class Meta:
+        model = User
+        fields = ['username', 'password', 'last_name', 'first_name']
+
+    def create(self, validated_data):
+        username = validated_data['username']
+        last_name = validated_data['last_name']
+        first_name = validated_data['first_name']
+        password = validated_data['password']
+        new_user = User(username=username, last_name=last_name, first_name=first_name)
+        new_user.set_password(password)
+        new_user.save()
+        return validated_data
 
